@@ -53,20 +53,6 @@ namespace MineSweeper{
     cout << endl;
   }
   
-  void Board::printDebug(){
-    cout << "printing board" << endl;
-    for (int i = 0; i < m_size; ++i){
-      for (int j = 0; j < m_size; ++j){
-	if (m_hasMine[i][j])
-	  cout << 'X';
-	else
-	  cout << m_nNeighbors[i][j];
-      }
-      cout << endl;
-    }
-    cout << endl;
-  }
-
   bool Board::isSolved(){
     int nExplored = 0;
     for (int i = 0; i < m_size; ++i){

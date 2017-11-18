@@ -19,7 +19,6 @@ namespace MineSweeper{
   public:
     Board(int _size, const std::vector<std::pair<int,int>> &_mines); // size up to 50
     void print(bool displayUnexplored);
-    void printDebug();
     bool isSolved();
     void explore(int i, int j, std::vector<ExploredSquare> &outExploredSquares);
     
