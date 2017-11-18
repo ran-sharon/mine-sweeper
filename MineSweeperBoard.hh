@@ -1,12 +1,12 @@
 #pragma once
 
 #include <vector>
-#include <pair>
+#include <utility>
 
 namespace MineSweeper{
   struct ExploredSquare{
   public:
-    ExploredSquare(int _i. int _j, int _nNeighbors) :
+    ExploredSquare(int _i, int _j, int _nNeighbors) :
       i(_i),
       j(_j),
       nNeighbors(_nNeighbors){}
@@ -17,17 +17,18 @@ namespace MineSweeper{
   
   class Board{
   public:
-    Board(int _size, int _nMines);
     Board(int _size, const std::vector<std::pair<int,int>> &_mines); // size up to 50
-    ~Board();
     void print(bool displayUnexplored);
+    void printDebug();
     bool isSolved();
-    std::vector<ExploredSquare> explore(int i, int j);
+    void explore(int i, int j, std::vector<ExploredSquare> &outExploredSquares);
     
   private:
+    void initIsExplored();
     void initMines(const std::vector<std::pair<int,int>> &_mines);
     void initNeighbors(); // must be called only after initMines
     std::vector<std::pair<int,int>> getNeighbors(int i, int j);
+    
     const int m_size;
     const int m_nMines;
     std::vector<std::vector<bool>> m_isExplored;
