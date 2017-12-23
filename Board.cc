@@ -1,6 +1,6 @@
 #include <stdexcept>
 #include <iostream>
-#include "MineSweeperBoard.hh"
+#include "Board.hh"
 
 using namespace std;
 
@@ -105,10 +105,10 @@ namespace MineSweeper{
     }
   }
 
-  void Board::explore(int i, int j, vector<ExploredSquare> &outExploredSquares){
+  void Board::explore(const pair<int,int> &move, vector<ExploredSquare> &outExploredSquares){
     outExploredSquares.clear();
     vector<pair<int,int>> exploreQueue;
-    exploreQueue.push_back({i, j});
+    exploreQueue.push_back(move);
     while (exploreQueue.size() != 0){
       pair<int,int> curPoint = exploreQueue.back();
       int i = curPoint.first;
@@ -116,7 +116,6 @@ namespace MineSweeper{
       exploreQueue.pop_back();
       bool hasMine = m_hasMine[i][j];
       bool isExplored = m_isExplored[i][j];
-      //cout << "exploring, i=" << i << ",j=" << j << ", hasMine" << hasMine << " isExplored" << isExplored << endl;
       if (!hasMine && !isExplored){
 	outExploredSquares.push_back(ExploredSquare(i, j, m_nNeighbors[i][j]));
 	m_isExplored[i][j] = true;
