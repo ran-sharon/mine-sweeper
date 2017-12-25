@@ -7,5 +7,8 @@ board: Board.cc BoardTester.cc
 framework: Board.cc MultiGameFramework.cc PlayerFactory.cc RandomPlayer.cc FrameworkTester.cc
 	$(CC) -o frTest Board.cc MultiGameFramework.cc PlayerFactory.cc RandomPlayer.cc FrameworkTester.cc $(CFLAGS)
 
+utils: Utils.cc utilTester.cc
+	$(CC) -o utilTest Utils.cc utilTester.cc $(CFLAGS)
+
 clean:
 	rm *Test

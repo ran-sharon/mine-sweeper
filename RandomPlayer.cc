@@ -3,6 +3,12 @@
 using namespace std;
 
 namespace MineSweeper{
+  RandomPlayer::RandomPlayer(int size, int nMines) :
+    PlayerBase(size, nMines),
+    m_unexploredPoints(),
+    m_rd(),
+    m_rng(m_rd()) {}
+  
   void RandomPlayer::init(){
     m_unexploredPoints.clear();
     for (int i = 0; i < m_size; ++i){
@@ -10,8 +16,6 @@ namespace MineSweeper{
 	m_unexploredPoints.insert({i,j});
       }
     }
-    random_device m_rd;
-    mt19937 m_rng(m_rd());
   }
 
   bool RandomPlayer::determineIfSolved(){

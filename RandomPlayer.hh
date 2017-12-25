@@ -11,7 +11,7 @@ namespace MineSweeper{
 
   class RandomPlayer : public PlayerBase {
   public:
-    using PlayerBase::PlayerBase;
+    RandomPlayer(int size, int nMines);
     virtual std::pair<int,int> makeMove() override;
     virtual bool determineIfSolved() override;
     virtual void postMoveProcess(const std::vector<ExploredSquare> &exploredPoints) override;
