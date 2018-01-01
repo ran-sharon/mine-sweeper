@@ -24,7 +24,7 @@ namespace MineSweeper{
 
   void RandomPlayer::postMoveProcess(const vector<ExploredSquare> &exploredPoints){
     for (auto it = exploredPoints.cbegin(); it != exploredPoints.cend(); ++it){
-      auto pt = m_unexploredPoints.find({it->i, it->j});
+      auto pt = m_unexploredPoints.find(it->pt);
       if (pt != m_unexploredPoints.end())
 	m_unexploredPoints.erase(pt);
     }

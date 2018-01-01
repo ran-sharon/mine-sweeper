@@ -1,6 +1,7 @@
 #include <stdexcept>
 #include <iostream>
 #include "Board.hh"
+#include "Utils.hh"
 
 using namespace std;
 
@@ -64,23 +65,6 @@ namespace MineSweeper{
     return nExplored == nSafeSquares;
   }
 
-
-  vector<pair<int,int>> Board::getNeighbors(int i, int j){
-    vector<pair<int,int>> neighbors;
-    for (auto di : {-1, 0, 1}){
-      bool iInLimits = ((i + di) >=0) && ((i + di) < m_size);
-      if (!iInLimits) continue;
-      for (auto dj : {-1, 0, 1}){
-	bool jInLimits = ((j + dj) >=0) && ((j + dj) < m_size);
-	if (!jInLimits) continue;
-	if ((di == 0) && (dj == 0))
-	  continue;
-	neighbors.push_back({i + di, j + dj});
-      }
-    }
-    return neighbors;
-  }
-
   void Board::initMines(const vector<pair<int,int>> &_mines){
     for (int i = 0; i < m_size; ++i){
       for (int j = 0; j < m_size; ++j){
@@ -89,17 +73,17 @@ namespace MineSweeper{
     }
     for (auto mine = _mines.cbegin(); mine != _mines.cend(); ++mine){
       m_hasMine[mine->first][mine->second] = true;
-    }
-    
+    }    
   }
   
   void Board::initNeighbors(){
     for (int i = 0; i < m_size; ++i){
       for (int j = 0; j < m_size; ++j){
 	m_nNeighbors[i][j] = 0;
-	auto neighbors = getNeighbors(i, j);
-	for (auto neighbor = neighbors.cbegin(); neighbor != neighbors.cend(); ++neighbor){
-	  m_nNeighbors[i][j] += m_hasMine[neighbor->first][neighbor->second];
+	set<pair<int,int>> neighbors;
+	Utils::getNeighbors({i,j}, 1, neighbors, m_size);
+	for (auto neighbor : neighbors){
+	  m_nNeighbors[i][j] += m_hasMine[neighbor.first][neighbor.second];
 	}
       }
     }
@@ -117,12 +101,13 @@ namespace MineSweeper{
       bool hasMine = m_hasMine[i][j];
       bool isExplored = m_isExplored[i][j];
       if (!hasMine && !isExplored){
-	outExploredSquares.push_back(ExploredSquare(i, j, m_nNeighbors[i][j]));
+	outExploredSquares.push_back(ExploredSquare(curPoint, m_nNeighbors[i][j]));
 	m_isExplored[i][j] = true;
 	if (m_nNeighbors[i][j] == 0){
-	  auto neighbors = getNeighbors(i, j);
-	  for (auto neighbor = neighbors.cbegin(); neighbor != neighbors.cend(); ++neighbor){
-	    exploreQueue.push_back({neighbor->first, neighbor->second});
+	  set<pair<int,int>> neighbors;
+	  Utils::getNeighbors({i,j}, 1, neighbors, m_size);
+	  for (auto neighbor : neighbors){
+	    exploreQueue.push_back(neighbor);
 	  }
 	}
       }

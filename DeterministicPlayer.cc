@@ -25,25 +25,7 @@ namespace MineSweeper{
     mt19937 m_rng(m_rd());
   }
 
-  void DeterministicPlayer::getNeighbors(pair<int,int> point, int range, set<pair<int,int>> &neighbors){
-    range = abs(range);
-    neighbors.clear();
-    int x = point.first;
-    int y = point.second;
-    for (int dx = -range; dx <= range; ++dx){
-      bool xInBounds = ((x + dx) >= 0) && ((x + dx) < m_size);
-      if (!xInBounds)
-	continue;
-      for (int dy = -range; dy <= range; ++dy){
-	bool yInBounds = ((y + dy) >= 0) && ((y + dy) < m_size);
-	if (!yInBounds)
-	  continue;
-	if ((dx == 0) && (dy == 0))
-	  continue;
-	neighbors.insert({x + dx, y + dy});
-      }      
-    }
-  }
+  
 
   void DeterministicPlayer::refineGroups(pair<int,int> idxA, pair<int,int> idxB){
     auto itA = m_knownUniverse.find(idxA);
@@ -96,7 +78,13 @@ namespace MineSweeper{
   }
 
   void DeterministicPlayer::registerAsAllMines(pair<int,int> idx){
-    
+    auto itGroup = m_knownUniverse.find(idx).second;
+    auto points = itGroup->m_members;
+    m_knownUniverse.erase(itGroup);
+    for (auto point : points){
+      m_mines.insert(point);
+      removePointFromNeighbors(point, true);
+    }        
   }  
 
   void DeterministicPlayer::registerGroupForSafeExploration(pair<int,int> idx){
@@ -111,7 +99,7 @@ namespace MineSweeper{
 
   void DeterministicPlayer::removePointFromNeighbors(pair<int,int> point, bool isMine){
     set<pair<int,int>> neighbors;
-    getNeighbors(point,1,neighbors);
+    Utils::getNeighbors(point,1,neighbors,m_size);
     for (auto &neighbor : neighbors){
       auto &neighborGroupPair = m_knownUniverse.find(neighbor);
       if (neighborGroupPair != m_knownUniverse.end()){
@@ -130,8 +118,12 @@ namespace MineSweeper{
   void DeterministicPlayer::cleanDirtyGroups(){
     while(m_dirtyGroups.size() != 0){
       auto it = m_dirtyGroups.begin();
+      if (m_knownUniverse.find(*it) == m_knownUniverse.end()){
+	m_dirtyGroups.erase(it);
+	continue;
+      }
       set<pair<int,int>> neighbors;
-      getNeighbors(point,2,neighbors);
+      Utils::getNeighbors(point,2,neighbors,m_size);
       for (auto &neighbor : neighbors){
 	if (m_knownUniverse.find(neighbor) != m_knownUniverse.end())
 	  refineGroups(*it, neighbor);
@@ -185,8 +177,10 @@ namespace MineSweeper{
       removeMinesFromNewGroup(pointGroup);
       removeExploredPointsFromNewGroup(pointGroup);
       m_knownUniverse.insert({pt, pointGroup});
+      checkIfGroupIsDone(pt);
       m_dirtyGroups.insert(pt);
     }
+    cleanDirtyGroups();
   }
 
   void DeterministicPlayer::removeMinesFromNewGroup(PointGroup &group){

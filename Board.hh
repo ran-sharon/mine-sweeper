@@ -6,12 +6,10 @@
 namespace MineSweeper{
   struct ExploredSquare{
   public:
-    ExploredSquare(int _i, int _j, int _nNeighbors) :
-      i(_i),
-      j(_j),
+    ExploredSquare(std::pair<int,int> _pt, int _nNeighbors) :
+      pt(_pt),
       nNeighbors(_nNeighbors){}
-    int i;
-    int j;
+    std::pair<int,int> pt;    
     int nNeighbors;
   };
   
@@ -26,7 +24,6 @@ namespace MineSweeper{
     void initIsExplored();
     void initMines(const std::vector<std::pair<int,int>> &_mines);
     void initNeighbors(); // must be called only after initMines
-    std::vector<std::pair<int,int>> getNeighbors(int i, int j);
     
     const int m_size;
     const int m_nMines;

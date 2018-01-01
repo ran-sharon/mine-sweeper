@@ -1,6 +1,7 @@
 #pragma once
 
 #include <set>
+#include <utility>
 
 namespace Utils{
   template<typename T>
@@ -20,4 +21,6 @@ namespace Utils{
   
   template<typename T>
   void setDiff(std::set<T> &inAndOut, const std::set<T> &blacklist);
+
+  void getNeighbors(std::pair<int,int> point, int range, std::set<std::pair<int,int>> &neighbors, int size);
 }

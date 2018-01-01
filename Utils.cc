@@ -53,6 +53,25 @@ namespace Utils{
     }
   }
 
+  void getNeighbors(pair<int,int> point, int range, set<pair<int,int>> &neighbors, int size){
+    neighbors.clear();
+    int x = point.first;
+    int y = point.second;
+    for (int dx = -range; dx <= range; ++dx){
+      bool xInBounds = ((x + dx) >= 0) && ((x + dx) < size);
+      if (!xInBounds)
+	continue;
+      for (int dy = -range; dy <= range; ++dy){
+	bool yInBounds = ((y + dy) >= 0) && ((y + dy) < size);
+	if (!yInBounds)
+	  continue;
+	if ((dx == 0) && (dy == 0))
+	  continue;
+	neighbors.insert({x + dx, y + dy});
+      }      
+    }
+  }
+
   template void printSet<int>(const std::set<int> &mySet);
   template void setUnion<int>(const std::set<int> &setA, const std::set<int> &setB, std::set<int> &result);
   template void setDiff<int>(const std::set<int> &in, const std::set<int> &blacklist, std::set<int> &out);
