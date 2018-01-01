@@ -1,8 +1,6 @@
 #include <iostream>
 #include "Utils.hh"
 
-using namespace std;
-
 namespace Utils{
   
   template<typename T>
@@ -10,6 +8,15 @@ namespace Utils{
     result = setA;
     for (auto it = setB.cbegin(); it != setB.cend(); ++it){
       if (result.find(*it) == result.end())
+	result.insert(*it);
+    }
+  }
+
+  template<typename T>
+  void setIntersect(const std::set<T> &setA, const std::set<T> &setB, std::set<T> &result){
+    result.clear();
+    for (auto it = setA.cbegin(); it != setA.cend(); ++it){
+      if (setB.find(*it) != setB.cend())
 	result.insert(*it);
     }
   }
@@ -26,12 +33,29 @@ namespace Utils{
   template<typename T>
   void printSet(const std::set<T> &mySet){
     for (auto it = mySet.cbegin(); it != mySet.cend(); ++it){
-      cout << *it << ", ";
+      std::cout << *it << ", ";
     }
-    cout << endl;
+    std::cout << std::endl;
+  }
+
+  template<typename T>
+  void setDiff(const std::set<T> &in, const std::set<T> &blacklist, std::set<T> &out){
+    out = in;
+    for (auto it = blacklist.cbegin(); it != blacklist.cend(); ++it){
+      out.erase(*it);
+    }
+  }
+  
+  template<typename T>
+  void setDiff(std::set<T> &inAndOut, const std::set<T> &blacklist){    
+    for (auto it = blacklist.cbegin(); it != blacklist.cend(); ++it){
+      inAndOut.erase(*it);
+    }
   }
 
   template void printSet<int>(const std::set<int> &mySet);
   template void setUnion<int>(const std::set<int> &setA, const std::set<int> &setB, std::set<int> &result);
+  template void setDiff<int>(const std::set<int> &in, const std::set<int> &blacklist, std::set<int> &out);
   template bool isSubset<int>(const std::set<int> &small, const std::set<int> &big);
+  template void setIntersect<int>(const std::set<int> &setA, const std::set<int> &setB, std::set<int> &result);
 }

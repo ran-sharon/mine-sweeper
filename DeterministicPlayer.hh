@@ -28,10 +28,12 @@ namespace MineSweeper{
     std::set<std::pair<int,int>> m_restOfTheWorld;
     std::set<std::pair<int,int>> m_exploredPoints;
     std::set<std::pair<int,int>> m_mines;
-    std::set<std::pair<int,int>> m_clearPointsToExplore;
+    std::set<std::pair<int,int>> m_dirtyGroups;
+    std::set<std::pair<int,int>> m_safePointsForExploration;
     std::map<std::pair<int,int>, PointGroup> m_knownUniverse;
     std::random_device m_rd;
     std::mt19937 m_rng;
+    int m_nInitialMines;
     void clearMine(std::pair<int,int> mine);
     void getNeighbors(std::pair<int,int> point, int range, std::set<std::pair<int,int>> &neighbors);
     bool refineGroups(std::pair<int,int> idxA, std::pair<int,int> idxB);
