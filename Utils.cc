@@ -53,7 +53,7 @@ namespace Utils{
     }
   }
 
-  void getNeighbors(pair<int,int> point, int range, set<pair<int,int>> &neighbors, int size){
+  void getNeighbors(std::pair<int,int> point, int range, std::set<std::pair<int,int>> &neighbors, int size){
     neighbors.clear();
     int x = point.first;
     int y = point.second;
@@ -75,6 +75,10 @@ namespace Utils{
   template void printSet<int>(const std::set<int> &mySet);
   template void setUnion<int>(const std::set<int> &setA, const std::set<int> &setB, std::set<int> &result);
   template void setDiff<int>(const std::set<int> &in, const std::set<int> &blacklist, std::set<int> &out);
+  template void setDiff<std::pair<int,int>>(const std::set<std::pair<int,int>> &in, const std::set<std::pair<int,int>> &blacklist, std::set<std::pair<int,int>> &out);
   template bool isSubset<int>(const std::set<int> &small, const std::set<int> &big);
+  template bool isSubset<std::pair<int,int>>(const std::set<std::pair<int,int>> &small, const std::set<std::pair<int,int>> &big);
   template void setIntersect<int>(const std::set<int> &setA, const std::set<int> &setB, std::set<int> &result);
+  template void setIntersect<std::pair<int,int>>(const std::set<std::pair<int,int>> &setA, const std::set<std::pair<int,int>> &setB, std::set<std::pair<int,int>> &result);
+  template void setDiff<std::pair<int,int>>(std::set<std::pair<int,int>> &inAndOut, const std::set<std::pair<int,int>> &blacklist);
 }

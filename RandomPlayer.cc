@@ -18,10 +18,6 @@ namespace MineSweeper{
     }
   }
 
-  bool RandomPlayer::determineIfSolved(){
-    return (static_cast<int>(m_unexploredPoints.size()) <= (m_size*m_size - m_nMines));
-  }
-
   void RandomPlayer::postMoveProcess(const vector<ExploredSquare> &exploredPoints){
     for (auto it = exploredPoints.cbegin(); it != exploredPoints.cend(); ++it){
       auto pt = m_unexploredPoints.find(it->pt);

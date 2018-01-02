@@ -13,7 +13,6 @@ namespace MineSweeper{
   public:
     RandomPlayer(int size, int nMines);
     virtual std::pair<int,int> makeMove() override;
-    virtual bool determineIfSolved() override;
     virtual void postMoveProcess(const std::vector<ExploredSquare> &exploredPoints) override;
     virtual void init() override;
   private:

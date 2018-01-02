@@ -10,5 +10,8 @@ framework: Board.cc MultiGameFramework.cc PlayerFactory.cc RandomPlayer.cc Frame
 utils: Utils.cc utilTester.cc
 	$(CC) -o utilTest Utils.cc utilTester.cc $(CFLAGS)
 
+det: Board.cc MultiGameFramework.cc PlayerFactory.cc RandomPlayer.cc detTester.cc Utils.cc DeterministicPlayer.cc
+	$(CC) -o detTest Board.cc MultiGameFramework.cc PlayerFactory.cc RandomPlayer.cc detTester.cc Utils.cc DeterministicPlayer.cc $(CFLAGS)
+
 clean:
 	rm *Test

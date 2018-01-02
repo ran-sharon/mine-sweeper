@@ -1,4 +1,5 @@
 #include "DeterministicPlayer.hh"
+#include "Utils.hh"
 
 using namespace std;
 
@@ -31,7 +32,7 @@ namespace MineSweeper{
     auto itA = m_knownUniverse.find(idxA);
     auto itB = m_knownUniverse.find(idxB);
     if ((itA == m_knownUniverse.end()) || (itB == m_knownUniverse.end())){
-      return false;
+      return;
     }
     bool aInB = Utils::isSubset(itA->second.m_members,itB->second.m_members);
     bool bInA = Utils::isSubset(itB->second.m_members,itA->second.m_members);
@@ -68,19 +69,19 @@ namespace MineSweeper{
   }
 
   void DeterministicPlayer::checkIfGroupIsDone(pair<int,int> idx){
-    auto &group = m_knownUniverse.find(idxBig)->second;
+    auto &group = m_knownUniverse.find(idx)->second;
     if (group.m_nMines == 0){
       registerGroupForSafeExploration(idx);
     }
-    if (group.m_nMines == group.m_members.size()){
+    if (group.m_nMines == static_cast<int>(group.m_members.size())){
       registerAsAllMines(idx);
     }
   }
 
   void DeterministicPlayer::registerAsAllMines(pair<int,int> idx){
-    auto itGroup = m_knownUniverse.find(idx).second;
-    auto points = itGroup->m_members;
-    m_knownUniverse.erase(itGroup);
+    auto &group = m_knownUniverse.find(idx)->second;
+    auto points = group.m_members;
+    m_knownUniverse.erase(idx);
     for (auto point : points){
       m_mines.insert(point);
       removePointFromNeighbors(point, true);
@@ -88,9 +89,9 @@ namespace MineSweeper{
   }  
 
   void DeterministicPlayer::registerGroupForSafeExploration(pair<int,int> idx){
-    auto itGroup = m_knownUniverse.find(idx).second;
-    auto points = itGroup->m_members;
-    m_knownUniverse.erase(itGroup);
+    auto &group = m_knownUniverse.find(idx)->second;
+    auto points = group.m_members;
+    m_knownUniverse.erase(idx);
     for (auto point : points){
       m_safePointsForExploration.insert(point);
       removePointFromNeighbors(point, false);
@@ -101,14 +102,14 @@ namespace MineSweeper{
     set<pair<int,int>> neighbors;
     Utils::getNeighbors(point,1,neighbors,m_size);
     for (auto &neighbor : neighbors){
-      auto &neighborGroupPair = m_knownUniverse.find(neighbor);
+      auto neighborGroupPair = m_knownUniverse.find(neighbor);
       if (neighborGroupPair != m_knownUniverse.end()){
-	auto &neighborGroup = neighborGroupPair.second;
-	if (neighborGroup->m_members.find(point) != neighborGroup->m_members.end()){
+	auto &neighborGroup = neighborGroupPair->second;
+	if (neighborGroup.m_members.find(point) != neighborGroup.m_members.end()){
 	  if (isMine){
-	    neighborGroup->m_nMines--;
+	    neighborGroup.m_nMines--;
 	  }
-	  neighborGroup->m_members.erase(point);
+	  neighborGroup.m_members.erase(point);
 	  m_dirtyGroups.insert(neighbor);
 	}
       }
@@ -123,7 +124,7 @@ namespace MineSweeper{
 	continue;
       }
       set<pair<int,int>> neighbors;
-      Utils::getNeighbors(point,2,neighbors,m_size);
+      Utils::getNeighbors(*it,2,neighbors,m_size);
       for (auto &neighbor : neighbors){
 	if (m_knownUniverse.find(neighbor) != m_knownUniverse.end())
 	  refineGroups(*it, neighbor);
@@ -149,31 +150,47 @@ namespace MineSweeper{
     pair<int,int> lowestProbabilityPoint = *(m_restOfTheWorld.begin()); // place-holder only
     for (auto universeMember : m_knownUniverse){
       auto &group = universeMember.second;
-      double groupProbability = static_cast<double>(group.m_nMines)/static_cast<double>(group.m_members->size());
-      if (groupProbability < lowestProbabilityPoint){
+      double groupProbability = static_cast<double>(group.m_nMines)/static_cast<double>(group.m_members.size());
+      if (groupProbability < lowestProbabilitySoFar){
 	lowestProbabilityPoint = randomizeFromGroup(group);
 	lowestProbabilitySoFar = groupProbability;
       }
     }
     
     double restOfWorldProbability = getRestOfWorldMineProbability();
-    if (restOfWorldProbability < lowestProbabilitySoFar)
+    if ((m_restOfTheWorld.size()!=0) && (restOfWorldProbability < lowestProbabilitySoFar))
       lowestProbabilityPoint  = randomizeRestOfWorldPoint();
-    removePointFromNeighbors(lowestProbabilityPoint);
+    removePointFromNeighbors(lowestProbabilityPoint, false);
     return lowestProbabilityPoint;
+  }
+
+  pair<int,int> DeterministicPlayer::randomizeRestOfWorldPoint(){
+    uniform_int_distribution<int> uni(0,m_restOfTheWorld.size() - 1);
+    int idx = uni(m_rng);
+    auto it = m_restOfTheWorld.begin();
+    advance(it, idx);
+    return *it;
+  }
+  
+  pair<int,int> DeterministicPlayer::randomizeFromGroup(PointGroup &group){
+    uniform_int_distribution<int> uni(0,group.m_members.size() - 1);
+    int idx = uni(m_rng);
+    auto it = group.m_members.begin();
+    advance(it, idx);
+    return *it;
   }
 
   double DeterministicPlayer::getRestOfWorldMineProbability(){
     // currently implemented by assuming mines are evenly distributed on the board,
     // can be estimated more accurately with monte-carlo methods
     double restOfWorldPortion = static_cast<double>(m_restOfTheWorld.size())/static_cast<double>(m_size*m_size);
-    return restOfWorldPortion * static_cast<double> m_nInitialMines;
+    return restOfWorldPortion * static_cast<double> (m_nInitialMines);
   }
 
   void DeterministicPlayer::postMoveProcess(const vector<ExploredSquare> &exploredPoints){
     for (auto exploredSquare : exploredPoints){
-      pair<int,int> pt = {exploredSquare.i, exploredSquare.j};
-      PointGroup pointGroup(pt, exploredSquare.nNeighbors);
+      pair<int,int> pt = exploredSquare.pt;
+      PointGroup pointGroup(pt, exploredSquare.nNeighbors, m_size);
       removeMinesFromNewGroup(pointGroup);
       removeExploredPointsFromNewGroup(pointGroup);
       m_knownUniverse.insert({pt, pointGroup});
@@ -184,12 +201,19 @@ namespace MineSweeper{
   }
 
   void DeterministicPlayer::removeMinesFromNewGroup(PointGroup &group){
-    group.m_nMines -= Utils::setIntersect(group.m_members, m_mines).size();
+    set<pair<int,int>> intersect;
+    Utils::setIntersect(group.m_members, m_mines, intersect);
+    group.m_nMines -= intersect.size();
     Utils::setDiff(group.m_members, m_mines);
   }
 
   void DeterministicPlayer::removeExploredPointsFromNewGroup(PointGroup &group){
     Utils::setDiff(group.m_members, m_exploredPoints);
     Utils::setDiff(group.m_members, m_safePointsForExploration);
+  }
+
+  DeterministicPlayer::PointGroup::PointGroup(pair<int,int> center, int nMines, int size) :
+    m_members(), m_nMines(nMines){
+    Utils::getNeighbors(center, 1, m_members, size);
   }
 }
