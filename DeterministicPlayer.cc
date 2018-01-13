@@ -1,3 +1,4 @@
+#include <iostream>
 #include "DeterministicPlayer.hh"
 #include "Utils.hh"
 
@@ -72,20 +73,21 @@ namespace MineSweeper{
     auto &group = m_knownUniverse.find(idx)->second;
     if (group.m_nMines == 0){
       registerGroupForSafeExploration(idx);
-    }
-    if (group.m_nMines == static_cast<int>(group.m_members.size())){
-      registerAsAllMines(idx);
+    } else {
+      if (group.m_nMines == static_cast<int>(group.m_members.size())){
+	registerAsAllMines(idx);
+      }
     }
   }
 
   void DeterministicPlayer::registerAsAllMines(pair<int,int> idx){
-    auto &group = m_knownUniverse.find(idx)->second;
+    auto &group = m_knownUniverse.find(idx)->second;    
     auto points = group.m_members;
     m_knownUniverse.erase(idx);
     for (auto point : points){
       m_mines.insert(point);
       removePointFromNeighbors(point, true);
-    }        
+    }
   }  
 
   void DeterministicPlayer::registerGroupForSafeExploration(pair<int,int> idx){
@@ -138,6 +140,7 @@ namespace MineSweeper{
       auto it = m_safePointsForExploration.begin();
       auto pt = *it;
       m_safePointsForExploration.erase(it);
+      m_exploredPoints.insert(pt);
       return pt;
     }
     else{
@@ -184,12 +187,15 @@ namespace MineSweeper{
     // currently implemented by assuming mines are evenly distributed on the board,
     // can be estimated more accurately with monte-carlo methods
     double restOfWorldPortion = static_cast<double>(m_restOfTheWorld.size())/static_cast<double>(m_size*m_size);
-    return restOfWorldPortion * static_cast<double> (m_nInitialMines);
+    return restOfWorldPortion * static_cast<double> (m_nInitialMines) / static_cast<double>(m_size*m_size);
   }
 
   void DeterministicPlayer::postMoveProcess(const vector<ExploredSquare> &exploredPoints){
     for (auto exploredSquare : exploredPoints){
       pair<int,int> pt = exploredSquare.pt;
+      m_exploredPoints.insert(pt);
+      m_safePointsForExploration.erase(pt);
+      removePointFromNeighbors(pt,false);
       PointGroup pointGroup(pt, exploredSquare.nNeighbors, m_size);
       removeMinesFromNewGroup(pointGroup);
       removeExploredPointsFromNewGroup(pointGroup);

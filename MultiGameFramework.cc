@@ -15,7 +15,7 @@ namespace MineSweeper{
 
   double MultiGameFramework::runGames(){
     double nWins = 0;
-    for (int iGame = 0; iGame < m_nGames; ++iGame){
+    for (int iGame = 0; iGame < m_nGames; ++iGame){      
       nWins += runOneGame();
     }
     return nWins/static_cast<double>(m_nGames);

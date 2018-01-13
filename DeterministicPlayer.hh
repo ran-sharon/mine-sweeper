@@ -34,7 +34,6 @@ namespace MineSweeper{
     std::mt19937 m_rng;
     int m_nInitialMines;
     void clearMine(std::pair<int,int> mine);
-    void getNeighbors(std::pair<int,int> point, int range, std::set<std::pair<int,int>> &neighbors);
     void refineGroups(std::pair<int,int> idxA, std::pair<int,int> idxB);
     std::pair<int,int> randomizeRestOfWorldPoint(); // pick one far away from the action.
     void removeSmallGroupFromLarge(std::pair<int,int> idxSmall, std::pair<int,int> idxBig);

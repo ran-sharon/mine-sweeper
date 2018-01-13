@@ -13,5 +13,8 @@ utils: Utils.cc utilTester.cc
 det: Board.cc MultiGameFramework.cc PlayerFactory.cc RandomPlayer.cc detTester.cc Utils.cc DeterministicPlayer.cc
 	$(CC) -o detTest Board.cc MultiGameFramework.cc PlayerFactory.cc RandomPlayer.cc detTester.cc Utils.cc DeterministicPlayer.cc $(CFLAGS)
 
+debugger: Board.cc PlayerFactory.cc RandomPlayer.cc Utils.cc DeterministicPlayer.cc PlayerDebugger.cc
+	$(CC) -o dbTest Board.cc PlayerFactory.cc RandomPlayer.cc Utils.cc DeterministicPlayer.cc PlayerDebugger.cc $(CFLAGS)
+
 clean:
 	rm *Test
