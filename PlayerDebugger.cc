@@ -7,13 +7,18 @@
 using namespace MineSweeper;
 using namespace std;
 
-enum class TestLayout {corner};
+enum class TestLayout {corner, corner2};
 
-constexpr int boardSize = 5;
+constexpr int boardSize = 10;
 
 void getMinesLayout(TestLayout testLayout, vector<pair<int,int>> &mines){
   mines.clear();
   if (testLayout == TestLayout::corner){
+    mines.push_back({1,1});
+  }
+  if (testLayout == TestLayout::corner2){
+    mines.push_back({0,1});
+    mines.push_back({1,0});
     mines.push_back({1,1});
   }
 }
@@ -46,6 +51,6 @@ void testLayout(TestLayout testLayout, PlayerID playerID){
 }
 
 int main(){
-  testLayout(TestLayout::corner,PlayerID::DETERMINISTIC);
+  testLayout(TestLayout::corner2,PlayerID::DETERMINISTIC);
   return 0;
 }

@@ -161,8 +161,9 @@ namespace MineSweeper{
     }
     
     double restOfWorldProbability = getRestOfWorldMineProbability();
-    if ((m_restOfTheWorld.size()!=0) && (restOfWorldProbability < lowestProbabilitySoFar))
+    if ((m_restOfTheWorld.size()!=0) && (restOfWorldProbability < lowestProbabilitySoFar)){
       lowestProbabilityPoint  = randomizeRestOfWorldPoint();
+    }      
     removePointFromNeighbors(lowestProbabilityPoint, false);
     return lowestProbabilityPoint;
   }
@@ -195,15 +196,22 @@ namespace MineSweeper{
       pair<int,int> pt = exploredSquare.pt;
       m_exploredPoints.insert(pt);
       m_safePointsForExploration.erase(pt);
+      m_restOfTheWorld.erase(pt);
       removePointFromNeighbors(pt,false);
       PointGroup pointGroup(pt, exploredSquare.nNeighbors, m_size);
       removeMinesFromNewGroup(pointGroup);
       removeExploredPointsFromNewGroup(pointGroup);
+      removeGroupFromRestOfWorld(pointGroup);
       m_knownUniverse.insert({pt, pointGroup});
       checkIfGroupIsDone(pt);
       m_dirtyGroups.insert(pt);
     }
     cleanDirtyGroups();
+  }
+
+  void DeterministicPlayer::removeGroupFromRestOfWorld(PointGroup &group){
+    for (auto pt : group.m_members)
+      m_restOfTheWorld.erase(pt);
   }
 
   void DeterministicPlayer::removeMinesFromNewGroup(PointGroup &group){

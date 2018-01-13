@@ -47,5 +47,6 @@ namespace MineSweeper{
     double getRestOfWorldMineProbability();
     void removeMinesFromNewGroup(PointGroup &group);
     void removeExploredPointsFromNewGroup(PointGroup &group);
+    void removeGroupFromRestOfWorld(PointGroup &group);
   };
 }
